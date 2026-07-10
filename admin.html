@@ -37,15 +37,15 @@
     </div>
 
     <script>
-        // BURAYA KENDI FIREBASE CONFIG BILGILERINI YAPISTIR (index.html ile aynı kod)
+        // Kendi Firebase Config Bilgilerin
         const firebaseConfig = {
             apiKey: "AIzaSyB9Nhe3GvmZIBPc0mIrLJAschX5YyzCqIU",
             authDomain: "guleryuzqrmenu.firebaseapp.com",
-            databaseURL: "https://guleryuzqrmenu-default-rtdb.europe-west1.firebasedatabase.app",
             projectId: "guleryuzqrmenu",
             storageBucket: "guleryuzqrmenu.firebasestorage.app",
             messagingSenderId: "449556886457",
-            appId: "1:449556886457:web:f215f6aa95701de02efc68"
+            appId: "1:449556886457:web:f215f6aa95701de02efc68",
+            databaseURL: "https://guleryuzqrmenu-default-rtdb.firebaseio.com" // Veritabanı URL'si eklendi
         };
 
         // Firebase'i Başlat
@@ -65,7 +65,7 @@
             const password = document.getElementById("adminPassword").value;
             const statusMsg = document.getElementById("statusMessage");
 
-            // BASİT GÜVENLİK ŞİFRESİ (Burayı değiştirebilirsin)
+            // BASİT GÜVENLİK ŞİFRESİ (1234 olarak ayarladım, buradan değiştirebilirsin)
             if (password !== "1234") {
                 statusMsg.className = "status error";
                 statusMsg.innerHTML = "Hatalı şifre!";
