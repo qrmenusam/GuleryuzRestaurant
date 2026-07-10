@@ -10,14 +10,22 @@
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f7; padding: 20px; }
         .admin-container { background-color: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); max-width: 500px; margin: 50px auto; }
-        h2 { margin-top: 0; color: #2c3e50; }
-        textarea, input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 16px; box-sizing: border-box; margin-bottom: 20px; }
-        textarea { height: 120px; resize: vertical; }
-        button { background-color: #27ae60; color: white; border: none; padding: 12px 20px; font-size: 16px; border-radius: 5px; cursor: pointer; width: 100%; }
+        h2 { margin-top: 0; color: #2c3e50; margin-bottom: 25px; text-align: center;}
+        
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; font-weight: 600; margin-bottom: 5px; color: #34495e; }
+        
+        input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 15px; box-sizing: border-box; }
+        input:focus { outline: none; border-color: #27ae60; box-shadow: 0 0 5px rgba(39, 174, 96, 0.3); }
+        
+        .password-section { background-color: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 25px; border: 1px solid #eee; }
+        
+        button { background-color: #27ae60; color: white; border: none; padding: 14px 20px; font-size: 16px; border-radius: 5px; cursor: pointer; width: 100%; font-weight: bold; margin-top: 10px;}
         button:hover { background-color: #219150; }
-        .status { margin-top: 15px; text-align: center; font-weight: bold; display: none; }
-        .success { color: #27ae60; }
-        .error { color: #e74c3c; }
+        
+        .status { margin-top: 15px; text-align: center; font-weight: bold; display: none; padding: 10px; border-radius: 5px; }
+        .success { color: #155724; background-color: #d4edda; border: 1px solid #c3e6cb; }
+        .error { color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; }
     </style>
 </head>
 <body>
@@ -25,11 +33,27 @@
     <div class="admin-container">
         <h2>Günün Menüsünü Güncelle</h2>
         
-        <label>Admin Şifresi:</label>
-        <input type="password" id="adminPassword" placeholder="Şifreyi giriniz...">
+        <div class="password-section">
+            <label style="font-weight: bold; color:#c0392b; display: block; margin-bottom: 5px;">Admin Şifresi:</label>
+            <input type="password" id="adminPassword" placeholder="Şifreyi giriniz...">
+        </div>
 
-        <label>Bugünün Yemekleri:</label>
-        <textarea id="menuInput" placeholder="Örn: Süzme Mercimek Çorbası&#10;Orman Kebabı&#10;Pirinç Pilavı&#10;Cacık"></textarea>
+        <div class="input-group">
+            <label>1. Çeşit:</label>
+            <input type="text" id="cesit1" placeholder="Örn: Süzme Mercimek Çorbası">
+        </div>
+        <div class="input-group">
+            <label>2. Çeşit:</label>
+            <input type="text" id="cesit2" placeholder="Örn: Orman Kebabı">
+        </div>
+        <div class="input-group">
+            <label>3. Çeşit:</label>
+            <input type="text" id="cesit3" placeholder="Örn: Pirinç Pilavı">
+        </div>
+        <div class="input-group">
+            <label>4. Çeşit:</label>
+            <input type="text" id="cesit4" placeholder="Örn: Cacık">
+        </div>
         
         <button onclick="saveMenu()">Menüyü Güncelle</button>
         
@@ -37,7 +61,7 @@
     </div>
 
     <script>
-        // Kendi Firebase Config Bilgilerin
+        // KENDİ FİREBASE CONFIG BİLGİLERİN (Eğer Database URL'ni değiştirdiysen burayı da güncelle)
         const firebaseConfig = {
             apiKey: "AIzaSyB9Nhe3GvmZIBPc0mIrLJAschX5YyzCqIU",
             authDomain: "guleryuzqrmenu.firebaseapp.com",
@@ -45,7 +69,7 @@
             storageBucket: "guleryuzqrmenu.firebasestorage.app",
             messagingSenderId: "449556886457",
             appId: "1:449556886457:web:f215f6aa95701de02efc68",
-            databaseURL: "https://guleryuzqrmenu-default-rtdb.firebaseio.com" // Veritabanı URL'si eklendi
+            databaseURL: "https://guleryuzqrmenu-default-rtdb.firebaseio.com"
         };
 
         // Firebase'i Başlat
@@ -53,11 +77,18 @@
         const database = firebase.database();
         const menuRef = database.ref('gununMenusu');
 
-        // Mevcut menüyü kutuya çek
+        // Sayfa açıldığında mevcut menüyü kutulara yerleştir
         menuRef.once('value').then((snapshot) => {
             const data = snapshot.val();
             if (data && data.text) {
-                document.getElementById("menuInput").value = data.text.replace(/<br>/g, '\n');
+                // Veritabanındaki metni <br> etiketlerinden bölüp diziye çeviriyoruz
+                const yemekler = data.text.split('<br>');
+                
+                // Her kutuya sırasıyla ilgili yemeği yaz (varsa)
+                if (yemekler[0]) document.getElementById("cesit1").value = yemekler[0];
+                if (yemekler[1]) document.getElementById("cesit2").value = yemekler[1];
+                if (yemekler[2]) document.getElementById("cesit3").value = yemekler[2];
+                if (yemekler[3]) document.getElementById("cesit4").value = yemekler[3];
             }
         });
 
@@ -65,7 +96,7 @@
             const password = document.getElementById("adminPassword").value;
             const statusMsg = document.getElementById("statusMessage");
 
-            // BASİT GÜVENLİK ŞİFRESİ (1234 olarak ayarladım, buradan değiştirebilirsin)
+            // BASİT GÜVENLİK ŞİFRESİ (1234)
             if (password !== "1234") {
                 statusMsg.className = "status error";
                 statusMsg.innerHTML = "Hatalı şifre!";
@@ -73,8 +104,21 @@
                 return;
             }
 
-            let inputText = document.getElementById("menuInput").value;
-            let formattedText = inputText.replace(/\n/g, '<br>'); // Alt satırları HTML koduna çevir
+            // 4 kutudaki veriyi alıyoruz (sağ-sol boşlukları temizleyerek)
+            const c1 = document.getElementById("cesit1").value.trim();
+            const c2 = document.getElementById("cesit2").value.trim();
+            const c3 = document.getElementById("cesit3").value.trim();
+            const c4 = document.getElementById("cesit4").value.trim();
+
+            // Sadece içi dolu olan kutuları bir listeye ekliyoruz
+            const menuDizisi = [];
+            if (c1) menuDizisi.push(c1);
+            if (c2) menuDizisi.push(c2);
+            if (c3) menuDizisi.push(c3);
+            if (c4) menuDizisi.push(c4);
+
+            // Dolu olan yemekleri aralarına <br> (alt satıra geçme HTML kodu) koyarak birleştiriyoruz
+            const formattedText = menuDizisi.join('<br>');
 
             // Veritabanına Yaz
             menuRef.set({
@@ -82,10 +126,14 @@
                 updatedAt: new Date().toISOString()
             }).then(() => {
                 statusMsg.className = "status success";
-                statusMsg.innerHTML = "Menü başarıyla güncellendi! Herkes görebilir.";
+                statusMsg.innerHTML = "Menü başarıyla güncellendi! Müşteriler görebilir.";
                 statusMsg.style.display = "block";
                 
-                setTimeout(() => { statusMsg.style.display = "none"; }, 4000);
+                // 4 saniye sonra mesajı gizle ve şifre kutusunu boşalt
+                setTimeout(() => { 
+                    statusMsg.style.display = "none"; 
+                    document.getElementById("adminPassword").value = "";
+                }, 4000);
             }).catch((error) => {
                 statusMsg.className = "status error";
                 statusMsg.innerHTML = "Bir hata oluştu: " + error;
