@@ -3,65 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Menü Yönetimi - Güleryüz</title>
-    <!-- Firebase Kütüphaneleri -->
+    <title>Güleryüz Admin Paneli</title>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f7; padding: 20px; }
-        .admin-container { background-color: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); max-width: 500px; margin: 50px auto; }
-        h2 { margin-top: 0; color: #2c3e50; margin-bottom: 25px; text-align: center;}
-        
-        .input-group { margin-bottom: 15px; }
-        .input-group label { display: block; font-weight: 600; margin-bottom: 5px; color: #34495e; }
-        
-        input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 15px; box-sizing: border-box; }
-        input:focus { outline: none; border-color: #27ae60; box-shadow: 0 0 5px rgba(39, 174, 96, 0.3); }
-        
-        .password-section { background-color: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 25px; border: 1px solid #eee; }
-        
-        button { background-color: #27ae60; color: white; border: none; padding: 14px 20px; font-size: 16px; border-radius: 5px; cursor: pointer; width: 100%; font-weight: bold; margin-top: 10px;}
-        button:hover { background-color: #219150; }
-        
-        .status { margin-top: 15px; text-align: center; font-weight: bold; display: none; padding: 10px; border-radius: 5px; }
-        .success { color: #155724; background-color: #d4edda; border: 1px solid #c3e6cb; }
-        .error { color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f1f2f6; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        h2 { color: #2c3e50; border-bottom: 2px solid #e74c3c; padding-bottom: 10px; margin-top: 0; }
+        label { display: block; margin: 10px 0 5px; font-weight: bold; color: #34495e; }
+        input, textarea, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; font-family: inherit;}
+        button { background-color: #e74c3c; color: white; border: none; padding: 10px 20px; margin-top: 15px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        button:hover { background-color: #c0392b; }
+        .product-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; }
+        .btn-delete { background-color: #34495e; padding: 5px 10px; font-size: 12px; margin-top: 0; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
     </style>
 </head>
 <body>
-
-    <div class="admin-container">
-        <h2>Günün Menüsünü Güncelle</h2>
-        
-        <div class="password-section">
-            <label style="font-weight: bold; color:#c0392b; display: block; margin-bottom: 5px;">Admin Şifresi:</label>
-            <input type="password" id="adminPassword" placeholder="Şifreyi giriniz...">
+    <div class="container">
+        <!-- GÜNÜN MENÜSÜ -->
+        <div class="card">
+            <h2>Günün Menüsü</h2>
+            <textarea id="gunun-menusu" rows="4" placeholder="Örn: Çorba<br>Tavuk Sote<br>Pilav"></textarea>
+            <button onclick="guncelleGununMenusu()">Günün Menüsünü Kaydet</button>
         </div>
 
-        <div class="input-group">
-            <label>1. Çeşit(Çorba):</label>
-            <input type="text" id="cesit1" placeholder="Örn: Süzme Mercimek Çorbası">
+        <!-- PAKET FİYATLARI -->
+        <div class="card">
+            <h2>Günün Menüsü Paket Fiyatları</h2>
+            <div class="grid-3">
+                <div>
+                    <label>2 Çeşit Fiyatı (₺)</label>
+                    <input type="number" id="fiyat-2">
+                </div>
+                <div>
+                    <label>3 Çeşit Fiyatı (₺)</label>
+                    <input type="number" id="fiyat-3">
+                </div>
+                <div>
+                    <label>4 Çeşit Fiyatı (₺)</label>
+                    <input type="number" id="fiyat-4">
+                </div>
+            </div>
+            <button onclick="guncellePaketFiyatlari()">Fiyatları Kaydet</button>
         </div>
-        <div class="input-group">
-            <label>2. Çeşit(Ana Yemek 1):</label>
-            <input type="text" id="cesit2" placeholder="Örn: Orman Kebabı">
+
+        <!-- YENİ ÜRÜN EKLE -->
+        <div class="card">
+            <h2>Yeni Ürün Ekle</h2>
+            <label>Kategori</label>
+            <select id="urun-kategori">
+                <option value="anaYemekler">Ana Yemekler</option>
+                <option value="icecekler">İçecekler</option>
+            </select>
+            
+            <label>Ürün Adı</label>
+            <input type="text" id="urun-adi" placeholder="Örn: Izgara Köfte">
+            
+            <label>Açıklama (İsteğe Bağlı)</label>
+            <input type="text" id="urun-aciklama" placeholder="Örn: Salata ve patates ile">
+            
+            <label>Fiyat (₺)</label>
+            <input type="number" id="urun-fiyati" placeholder="150">
+            
+            <button onclick="urunEkle()">Ürünü Ekle</button>
         </div>
-        <div class="input-group">
-            <label>3. Çeşit(Ana Yemek 2):</label>
-            <input type="text" id="cesit3" placeholder="Örn: Pirinç Pilavı">
+
+        <!-- MEVCUT ÜRÜNLER -->
+        <div class="card">
+            <h2>Mevcut Menü</h2>
+            <h3>Ana Yemekler</h3>
+            <div id="admin-ana-yemekler">Yükleniyor...</div>
+            <h3>İçecekler</h3>
+            <div id="admin-icecekler">Yükleniyor...</div>
         </div>
-        <div class="input-group">
-            <label>4. Çeşit(Tatlı):</label>
-            <input type="text" id="cesit4" placeholder="Örn: Cacık">
-        </div>
-        
-        <button onclick="saveMenu()">Menüyü Güncelle</button>
-        
-        <div id="statusMessage" class="status"></div>
     </div>
 
     <script>
-        // KENDİ FİREBASE CONFIG BİLGİLERİN (Eğer Database URL'ni değiştirdiysen burayı da güncelle)
         const firebaseConfig = {
             apiKey: "AIzaSyB9Nhe3GvmZIBPc0mIrLJAschX5YyzCqIU",
             authDomain: "guleryuzqrmenu.firebaseapp.com",
@@ -71,74 +90,72 @@
             appId: "1:449556886457:web:f215f6aa95701de02efc68",
             databaseURL: "https://guleryuzqrmenu-default-rtdb.firebaseio.com"
         };
-
-        // Firebase'i Başlat
         firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
-        const menuRef = database.ref('gununMenusu');
+        const db = firebase.database();
 
-        // Sayfa açıldığında mevcut menüyü kutulara yerleştir
-        menuRef.once('value').then((snapshot) => {
-            const data = snapshot.val();
-            if (data && data.text) {
-                // Veritabanındaki metni <br> etiketlerinden bölüp diziye çeviriyoruz
-                const yemekler = data.text.split('<br>');
-                
-                // Her kutuya sırasıyla ilgili yemeği yaz (varsa)
-                if (yemekler[0]) document.getElementById("cesit1").value = yemekler[0];
-                if (yemekler[1]) document.getElementById("cesit2").value = yemekler[1];
-                if (yemekler[2]) document.getElementById("cesit3").value = yemekler[2];
-                if (yemekler[3]) document.getElementById("cesit4").value = yemekler[3];
-            }
+        // Verileri Yükle
+        db.ref('gununMenusu').on('value', snap => { if(snap.exists()) document.getElementById('gunun-menusu').value = snap.val().text || ""; });
+        db.ref('paketFiyatlari').on('value', snap => { 
+            const data = snap.val() || {c2: 110, c3: 130, c4: 150};
+            document.getElementById('fiyat-2').value = data.c2;
+            document.getElementById('fiyat-3').value = data.c3;
+            document.getElementById('fiyat-4').value = data.c4;
         });
 
-        function saveMenu() {
-            const password = document.getElementById("adminPassword").value;
-            const statusMsg = document.getElementById("statusMessage");
-
-            // BASİT GÜVENLİK ŞİFRESİ (1234)
-            if (password !== "1234") {
-                statusMsg.className = "status error";
-                statusMsg.innerHTML = "Hatalı şifre!";
-                statusMsg.style.display = "block";
-                return;
-            }
-
-            // 4 kutudaki veriyi alıyoruz (sağ-sol boşlukları temizleyerek)
-            const c1 = document.getElementById("cesit1").value.trim();
-            const c2 = document.getElementById("cesit2").value.trim();
-            const c3 = document.getElementById("cesit3").value.trim();
-            const c4 = document.getElementById("cesit4").value.trim();
-
-            // Sadece içi dolu olan kutuları bir listeye ekliyoruz
-            const menuDizisi = [];
-            if (c1) menuDizisi.push(c1);
-            if (c2) menuDizisi.push(c2);
-            if (c3) menuDizisi.push(c3);
-            if (c4) menuDizisi.push(c4);
-
-            // Dolu olan yemekleri aralarına <br> (alt satıra geçme HTML kodu) koyarak birleştiriyoruz
-            const formattedText = menuDizisi.join('<br>');
-
-            // Veritabanına Yaz
-            menuRef.set({
-                text: formattedText,
-                updatedAt: new Date().toISOString()
-            }).then(() => {
-                statusMsg.className = "status success";
-                statusMsg.innerHTML = "Menü başarıyla güncellendi! Müşteriler görebilir.";
-                statusMsg.style.display = "block";
-                
-                // 4 saniye sonra mesajı gizle ve şifre kutusunu boşalt
-                setTimeout(() => { 
-                    statusMsg.style.display = "none"; 
-                    document.getElementById("adminPassword").value = "";
-                }, 4000);
-            }).catch((error) => {
-                statusMsg.className = "status error";
-                statusMsg.innerHTML = "Bir hata oluştu: " + error;
-                statusMsg.style.display = "block";
+        // Ürünleri Listeleme Fonksiyonu
+        function adminUrunListele(kategori, divId) {
+            db.ref('menu/' + kategori).on('value', snap => {
+                const div = document.getElementById(divId);
+                div.innerHTML = '';
+                snap.forEach(child => {
+                    const data = child.val();
+                    div.innerHTML += `
+                        <div class="product-item">
+                            <span><b>${data.ad}</b> - ₺${data.fiyat} ${data.aciklama ? '('+data.aciklama+')' : ''}</span>
+                            <button class="btn-delete" onclick="urunSil('${kategori}', '${child.key}')">Sil</button>
+                        </div>
+                    `;
+                });
             });
+        }
+        adminUrunListele('anaYemekler', 'admin-ana-yemekler');
+        adminUrunListele('icecekler', 'admin-icecekler');
+
+        // Kayıt İşlemleri
+        function guncelleGununMenusu() {
+            db.ref('gununMenusu').set({ text: document.getElementById('gunun-menusu').value });
+            alert("Günün Menüsü güncellendi!");
+        }
+
+        function guncellePaketFiyatlari() {
+            db.ref('paketFiyatlari').set({
+                c2: document.getElementById('fiyat-2').value,
+                c3: document.getElementById('fiyat-3').value,
+                c4: document.getElementById('fiyat-4').value
+            });
+            alert("Paket fiyatları güncellendi!");
+        }
+
+        function urunEkle() {
+            const kategori = document.getElementById('urun-kategori').value;
+            const ad = document.getElementById('urun-adi').value;
+            const aciklama = document.getElementById('urun-aciklama').value;
+            const fiyat = document.getElementById('urun-fiyati').value;
+            
+            if(!ad || !fiyat) return alert("Lütfen ürün adı ve fiyatı girin!");
+
+            db.ref('menu/' + kategori).push({ ad, aciklama, fiyat });
+            
+            document.getElementById('urun-adi').value = '';
+            document.getElementById('urun-aciklama').value = '';
+            document.getElementById('urun-fiyati').value = '';
+            alert("Ürün başarıyla eklendi!");
+        }
+
+        function urunSil(kategori, id) {
+            if(confirm("Bu ürünü silmek istediğinize emin misiniz?")) {
+                db.ref('menu/' + kategori + '/' + id).remove();
+            }
         }
     </script>
 </body>
