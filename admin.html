@@ -22,41 +22,12 @@
 </head>
 <body>
     <div class="container">
-        <!-- GÜNÜN MENÜSÜ YÖNETİMİ (SABİT 4 ÇEŞİT) -->
-    <div class="card">
-        <h2>Günün Menüsü (4 Çeşit)</h2>
-        <div style="display: flex; flex-direction: column; gap: 10px;">
-            <input type="text" id="cesit-1" placeholder="1. Çeşit">
-            <input type="text" id="cesit-2" placeholder="2. Çeşit">
-            <input type="text" id="cesit-3" placeholder="3. Çeşit">
-            <input type="text" id="cesit-4" placeholder="4. Çeşit">
-            <button onclick="guncelleGununMenusu()">Tüm Çeşitleri Kaydet</button>
+        <!-- GÜNÜN MENÜSÜ -->
+        <div class="card">
+            <h2>Günün Menüsü</h2>
+            <textarea id="gunun-menusu" rows="4" placeholder="Örn: Çorba<br>Tavuk Sote<br>Pilav"></textarea>
+            <button onclick="guncelleGununMenusu()">Günün Menüsünü Kaydet</button>
         </div>
-    </div>
-
-    <script>
-        // Verileri Yükle
-        db.ref('gununMenusu').on('value', snap => {
-            const data = snap.val();
-            if (data) {
-                document.getElementById('cesit-1').value = data.c1 || "";
-                document.getElementById('cesit-2').value = data.c2 || "";
-                document.getElementById('cesit-3').value = data.c3 || "";
-                document.getElementById('cesit-4').value = data.c4 || "";
-            }
-        });
-    
-    // Kayıt İşlemi
-    function guncelleGununMenusu() {
-        db.ref('gununMenusu').set({
-            c1: document.getElementById('cesit-1').value,
-            c2: document.getElementById('cesit-2').value,
-            c3: document.getElementById('cesit-3').value,
-            c4: document.getElementById('cesit-4').value
-        });
-        alert("Günün menüsü güncellendi!");
-    }
-</script>
 
         <!-- PAKET FİYATLARI -->
         <div class="card">
