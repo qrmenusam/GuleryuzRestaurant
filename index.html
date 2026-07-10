@@ -3,80 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Güleryüz Admin Paneli</title>
+    <title>Güleryüz Cafe & Restaurant</title>
+    <!-- Firebase Kütüphaneleri -->
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f1f2f6; padding: 20px; }
-        .container { max-width: 800px; margin: 0 auto; }
-        .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        h2 { color: #2c3e50; border-bottom: 2px solid #e74c3c; padding-bottom: 10px; margin-top: 0; }
-        label { display: block; margin: 10px 0 5px; font-weight: bold; color: #34495e; }
-        input, textarea, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; font-family: inherit;}
-        button { background-color: #e74c3c; color: white; border: none; padding: 10px 20px; margin-top: 15px; border-radius: 5px; cursor: pointer; font-weight: bold; }
-        button:hover { background-color: #c0392b; }
-        .product-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; }
-        .btn-delete { background-color: #34495e; padding: 5px 10px; font-size: 12px; margin-top: 0; }
-        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f9f9f9; color: #333; margin: 0; padding: 0; }
+        .header { background-color: #fff; text-align: center; padding: 20px; border-bottom: 2px solid #eaeaea; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .header h1 { margin: 0; color: #2c3e50; font-size: 26px; letter-spacing: 2px; font-weight: 800; }
+        .header p { margin: 5px 0 0; color: #7f8c8d; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
+        .container { padding: 15px; max-width: 600px; margin: 0 auto; }
+        
+        /* GÜNÜN MENÜSÜ TASARIMI */
+        .daily-menu-wrapper { background-color: #ffffff; border: 1px solid #dcdde1; border-radius: 10px; margin-top: 20px; margin-bottom: 35px; box-shadow: 0 6px 15px rgba(0,0,0,0.06); overflow: hidden; }
+        .daily-menu-header { background-color: #2c3e50; padding: 16px; text-align: center; }
+        .daily-menu-header h3 { margin: 0; color: #ffffff; font-size: 20px; letter-spacing: 1.5px; display: flex; align-items: center; justify-content: center; gap: 10px; text-transform: uppercase; }
+        #daily-content { padding: 20px 15px 5px 15px; }
+        .dish-list { display: flex; flex-direction: column; gap: 12px; }
+        .dish-item { display: flex; align-items: center; background-color: #ffffff; border: 1px solid #f1f2f6; border-left: 4px solid #e74c3c; padding: 12px 15px; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.02); font-size: 15px; font-weight: 600; color: #2f3542; }
+        .dish-icon { margin-right: 12px; font-size: 17px; background-color: #fdedec; border-radius: 50%; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; }
+        
+        /* FİYAT PAKETLERİ */
+        .daily-options-title { font-size: 13px; color: #7f8c8d; text-transform: uppercase; text-align: center; margin: 20px 0 15px 0; letter-spacing: 1px; position: relative; }
+        .daily-options-title::before, .daily-options-title::after { content: ""; display: inline-block; width: 40px; height: 1px; background-color: #ecf0f1; vertical-align: middle; margin: 0 10px; }
+        .daily-options { display: flex; flex-direction: column; gap: 10px; padding: 0 15px 20px 15px; }
+        .daily-option-item { display: flex; justify-content: space-between; align-items: center; background-color: #fcfcfc; border: 1px solid #eee; padding: 12px 15px; border-radius: 8px; }
+        .daily-option-name { font-weight: 700; color: #2c3e50; font-size: 15px; }
+        .daily-option-price { font-weight: bold; color: #fff; background-color: #e74c3c; padding: 6px 14px; border-radius: 6px; font-size: 14px; }
+
+        /* DİĞER KATEGORİLER (DİNAMİK) */
+        .category-title { border-bottom: 2px solid #e74c3c; padding-bottom: 5px; margin-top: 30px; color: #c0392b; font-size: 20px;}
+        .menu-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px dashed #ddd; }
+        .menu-item:last-child { border-bottom: none; }
+        .item-name { font-weight: 600; color: #2c3e50; }
+        .item-desc { font-size: 12px; color: #7f8c8d; display: block; margin-top: 5px; }
+        .item-price { font-weight: bold; color: #27ae60; white-space: nowrap; margin-left: 15px; font-size: 16px;}
     </style>
 </head>
 <body>
+    <div class="header">
+        <h1>GÜLERYÜZ</h1>
+        <p>Cafe & Restaurant</p>
+    </div>
     <div class="container">
-        <!-- GÜNÜN MENÜSÜ -->
-        <div class="card">
-            <h2>Günün Menüsü</h2>
-            <textarea id="gunun-menusu" rows="4" placeholder="Örn: Çorba<br>Tavuk Sote<br>Pilav"></textarea>
-            <button onclick="guncelleGununMenusu()">Günün Menüsünü Kaydet</button>
-        </div>
-
-        <!-- PAKET FİYATLARI -->
-        <div class="card">
-            <h2>Günün Menüsü Paket Fiyatları</h2>
-            <div class="grid-3">
-                <div>
-                    <label>2 Çeşit Fiyatı (₺)</label>
-                    <input type="number" id="fiyat-2">
+        
+        <!-- GÜNÜN MENÜSÜ ALANI -->
+        <div class="daily-menu-wrapper">
+            <div class="daily-menu-header">
+                <h3>🍽️ GÜNÜN MENÜSÜ</h3>
+            </div>
+            
+            <div id="daily-content">Yükleniyor...</div>
+            
+            <div class="daily-options-title">Paket Seçenekleri</div>
+            
+            <div class="daily-options">
+                <div class="daily-option-item">
+                    <span class="daily-option-name">2 Çeşit Yemek</span>
+                    <span class="daily-option-price" id="fiyat-goster-2">₺ --</span>
                 </div>
-                <div>
-                    <label>3 Çeşit Fiyatı (₺)</label>
-                    <input type="number" id="fiyat-3">
+                <div class="daily-option-item">
+                    <span class="daily-option-name">3 Çeşit Yemek</span>
+                    <span class="daily-option-price" id="fiyat-goster-3">₺ --</span>
                 </div>
-                <div>
-                    <label>4 Çeşit Fiyatı (₺)</label>
-                    <input type="number" id="fiyat-4">
+                <div class="daily-option-item">
+                    <span class="daily-option-name">4 Çeşit Yemek</span>
+                    <span class="daily-option-price" id="fiyat-goster-4">₺ --</span>
                 </div>
             </div>
-            <button onclick="guncellePaketFiyatlari()">Fiyatları Kaydet</button>
         </div>
 
-        <!-- YENİ ÜRÜN EKLE -->
-        <div class="card">
-            <h2>Yeni Ürün Ekle</h2>
-            <label>Kategori</label>
-            <select id="urun-kategori">
-                <option value="anaYemekler">Ana Yemekler</option>
-                <option value="icecekler">İçecekler</option>
-            </select>
-            
-            <label>Ürün Adı</label>
-            <input type="text" id="urun-adi" placeholder="Örn: Izgara Köfte">
-            
-            <label>Açıklama (İsteğe Bağlı)</label>
-            <input type="text" id="urun-aciklama" placeholder="Örn: Salata ve patates ile">
-            
-            <label>Fiyat (₺)</label>
-            <input type="number" id="urun-fiyati" placeholder="150">
-            
-            <button onclick="urunEkle()">Ürünü Ekle</button>
+        <!-- ANA YEMEKLER (VERİTABANINDAN GELECEK) -->
+        <h2 class="category-title">Ana Yemekler</h2>
+        <div class="menu-list" id="ana-yemekler-list">
+            Menü yükleniyor...
         </div>
 
-        <!-- MEVCUT ÜRÜNLER -->
-        <div class="card">
-            <h2>Mevcut Menü</h2>
-            <h3>Ana Yemekler</h3>
-            <div id="admin-ana-yemekler">Yükleniyor...</div>
-            <h3>İçecekler</h3>
-            <div id="admin-icecekler">Yükleniyor...</div>
+        <!-- İÇECEKLER (VERİTABANINDAN GELECEK) -->
+        <h2 class="category-title">İçecekler</h2>
+        <div class="menu-list" id="icecekler-list">
+            Menü yükleniyor...
         </div>
     </div>
 
@@ -93,70 +99,59 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // Verileri Yükle
-        db.ref('gununMenusu').on('value', snap => { if(snap.exists()) document.getElementById('gunun-menusu').value = snap.val().text || ""; });
-        db.ref('paketFiyatlari').on('value', snap => { 
-            const data = snap.val() || {c2: 110, c3: 130, c4: 150};
-            document.getElementById('fiyat-2').value = data.c2;
-            document.getElementById('fiyat-3').value = data.c3;
-            document.getElementById('fiyat-4').value = data.c4;
+        // 1. GÜNÜN MENÜSÜNÜ ÇEK
+        db.ref('gununMenusu').on('value', (snap) => {
+            const data = snap.val();
+            const displayDiv = document.getElementById("daily-content");
+            if (data && data.text) {
+                const yemekler = data.text.split('<br>');
+                let html = '<div class="dish-list">';
+                yemekler.forEach(y => {
+                    if (y.trim() !== "") {
+                        html += `<div class="dish-item"><span class="dish-icon">🍲</span><span>${y}</span></div>`;
+                    }
+                });
+                html += '</div>';
+                displayDiv.innerHTML = html;
+            } else {
+                displayDiv.innerHTML = "<div style='text-align:center; padding:10px; color:#7f8c8d;'>Menü güncelleniyor...</div>";
+            }
         });
 
-        // Ürünleri Listeleme Fonksiyonu
-        function adminUrunListele(kategori, divId) {
+        // 2. PAKET FİYATLARINI ÇEK
+        db.ref('paketFiyatlari').on('value', snap => {
+            const data = snap.val();
+            if(data) {
+                document.getElementById('fiyat-goster-2').innerText = `₺ ${data.c2 || '--'}`;
+                document.getElementById('fiyat-goster-3').innerText = `₺ ${data.c3 || '--'}`;
+                document.getElementById('fiyat-goster-4').innerText = `₺ ${data.c4 || '--'}`;
+            }
+        });
+
+        // 3. MENÜ KATEGORİLERİNİ ÇEK VE LİSTELE
+        function urunleriEkranaBas(kategori, divId) {
             db.ref('menu/' + kategori).on('value', snap => {
                 const div = document.getElementById(divId);
                 div.innerHTML = '';
-                snap.forEach(child => {
-                    const data = child.val();
-                    div.innerHTML += `
-                        <div class="product-item">
-                            <span><b>${data.ad}</b> - ₺${data.fiyat} ${data.aciklama ? '('+data.aciklama+')' : ''}</span>
-                            <button class="btn-delete" onclick="urunSil('${kategori}', '${child.key}')">Sil</button>
-                        </div>
-                    `;
-                });
+                if(snap.exists()) {
+                    snap.forEach(child => {
+                        const urun = child.val();
+                        let urunHtml = `<div class="menu-item"><div><span class="item-name">${urun.ad}</span>`;
+                        if(urun.aciklama) {
+                            urunHtml += `<span class="item-desc">${urun.aciklama}</span>`;
+                        }
+                        urunHtml += `</div><span class="item-price">₺ ${urun.fiyat}</span></div>`;
+                        div.innerHTML += urunHtml;
+                    });
+                } else {
+                    div.innerHTML = '<div style="color:#7f8c8d; padding:10px 0;">Henüz ürün eklenmedi.</div>';
+                }
             });
         }
-        adminUrunListele('anaYemekler', 'admin-ana-yemekler');
-        adminUrunListele('icecekler', 'admin-icecekler');
 
-        // Kayıt İşlemleri
-        function guncelleGununMenusu() {
-            db.ref('gununMenusu').set({ text: document.getElementById('gunun-menusu').value });
-            alert("Günün Menüsü güncellendi!");
-        }
+        urunleriEkranaBas('anaYemekler', 'ana-yemekler-list');
+        urunleriEkranaBas('icecekler', 'icecekler-list');
 
-        function guncellePaketFiyatlari() {
-            db.ref('paketFiyatlari').set({
-                c2: document.getElementById('fiyat-2').value,
-                c3: document.getElementById('fiyat-3').value,
-                c4: document.getElementById('fiyat-4').value
-            });
-            alert("Paket fiyatları güncellendi!");
-        }
-
-        function urunEkle() {
-            const kategori = document.getElementById('urun-kategori').value;
-            const ad = document.getElementById('urun-adi').value;
-            const aciklama = document.getElementById('urun-aciklama').value;
-            const fiyat = document.getElementById('urun-fiyati').value;
-            
-            if(!ad || !fiyat) return alert("Lütfen ürün adı ve fiyatı girin!");
-
-            db.ref('menu/' + kategori).push({ ad, aciklama, fiyat });
-            
-            document.getElementById('urun-adi').value = '';
-            document.getElementById('urun-aciklama').value = '';
-            document.getElementById('urun-fiyati').value = '';
-            alert("Ürün başarıyla eklendi!");
-        }
-
-        function urunSil(kategori, id) {
-            if(confirm("Bu ürünü silmek istediğinize emin misiniz?")) {
-                db.ref('menu/' + kategori + '/' + id).remove();
-            }
-        }
     </script>
 </body>
 </html>
