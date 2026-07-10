@@ -10,18 +10,93 @@
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f9f9f9; color: #333; margin: 0; padding: 0; }
         .header { background-color: #fff; text-align: center; padding: 20px; border-bottom: 2px solid #eaeaea; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .header h1 { margin: 0; color: #2c3e50; font-size: 24px; letter-spacing: 1px; }
-        .header p { margin: 5px 0 0; color: #7f8c8d; font-size: 14px; }
+        .header h1 { margin: 0; color: #2c3e50; font-size: 26px; letter-spacing: 2px; font-weight: 800; }
+        .header p { margin: 5px 0 0; color: #7f8c8d; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
         .container { padding: 15px; max-width: 600px; margin: 0 auto; }
-        .category-title { border-bottom: 2px solid #e74c3c; padding-bottom: 5px; margin-top: 30px; color: #c0392b; }
-        .menu-item { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px dashed #ccc; }
+        
+        /* GÜNÜN MENÜSÜ YENİ TASARIM */
+        .daily-menu-wrapper {
+            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+            padding: 4px; /* Renkli kenarlık efekti için */
+            border-radius: 12px;
+            margin-top: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 20px rgba(253, 160, 133, 0.4);
+        }
+        .daily-menu-inner {
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 20px;
+        }
+        .daily-menu-header {
+            text-align: center;
+            border-bottom: 2px dashed #fda085;
+            padding-bottom: 12px;
+            margin-bottom: 15px;
+        }
+        .daily-menu-header h3 {
+            margin: 0;
+            color: #d35400;
+            font-size: 22px;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        #daily-content {
+            text-align: center;
+            font-size: 16px;
+            color: #2c3e50;
+            line-height: 1.8;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding: 15px 10px;
+            background-color: #fff7f3;
+            border-radius: 8px;
+            border-left: 5px solid #fda085;
+        }
+        .daily-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .daily-option-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #fdfdfd;
+            border: 1px solid #eee;
+            padding: 12px 15px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        .daily-option-item:active {
+            transform: scale(0.98);
+            border-color: #fda085;
+        }
+        .daily-option-name {
+            font-weight: 700;
+            color: #34495e;
+            font-size: 15px;
+        }
+        .daily-option-price {
+            font-weight: bold;
+            color: #fff;
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 14px;
+            box-shadow: 0 3px 6px rgba(231, 76, 60, 0.3);
+        }
+
+        /* DİĞER KATEGORİLER */
+        .category-title { border-bottom: 2px solid #e74c3c; padding-bottom: 5px; margin-top: 30px; color: #c0392b; font-size: 20px;}
+        .menu-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px dashed #ddd; }
         .menu-item:last-child { border-bottom: none; }
-        .item-name { font-weight: 600; }
-        .item-desc { font-size: 12px; color: #7f8c8d; display: block; margin-top: 4px; }
-        .item-price { font-weight: bold; color: #27ae60; white-space: nowrap; margin-left: 15px; }
-        .daily-menu-box { background-color: #fff3cd; border: 1px solid #ffeeba; border-radius: 8px; padding: 15px; margin-top: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .daily-menu-box h3 { margin-top: 0; color: #856404; text-align: center; }
-        #daily-content { text-align: center; font-style: italic; color: #555; margin-bottom: 15px; }
+        .item-name { font-weight: 600; color: #2c3e50; }
+        .item-desc { font-size: 12px; color: #7f8c8d; display: block; margin-top: 5px; }
+        .item-price { font-weight: bold; color: #27ae60; white-space: nowrap; margin-left: 15px; font-size: 16px;}
     </style>
 </head>
 <body>
@@ -30,16 +105,34 @@
         <p>Cafe & Restaurant</p>
     </div>
     <div class="container">
-        <!-- Günün Menüsü -->
-        <div class="daily-menu-box">
-            <h3>Günün Menüsü (₺ 150)</h3>
-            <div id="daily-content">Yükleniyor...</div>
-            <div class="menu-item"><span class="item-name">2 Çeşit Yemek</span><span class="item-price">₺ 110</span></div>
-            <div class="menu-item"><span class="item-name">3 Çeşit Yemek</span><span class="item-price">₺ 130</span></div>
-            <div class="menu-item"><span class="item-name">4 Çeşit Yemek</span><span class="item-price">₺ 150</span></div>
+        
+        <!-- YENİ GÜNÜN MENÜSÜ ALANI -->
+        <div class="daily-menu-wrapper">
+            <div class="daily-menu-inner">
+                <div class="daily-menu-header">
+                    <h3>🍽️ Günün Menüsü</h3>
+                </div>
+                
+                <div id="daily-content">Yükleniyor...</div>
+                
+                <div class="daily-options">
+                    <div class="daily-option-item">
+                        <span class="daily-option-name">2 Çeşit Yemek</span>
+                        <span class="daily-option-price">₺ 110</span>
+                    </div>
+                    <div class="daily-option-item">
+                        <span class="daily-option-name">3 Çeşit Yemek</span>
+                        <span class="daily-option-price">₺ 130</span>
+                    </div>
+                    <div class="daily-option-item">
+                        <span class="daily-option-name">4 Çeşit Yemek</span>
+                        <span class="daily-option-price">₺ 150</span>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <!-- Ana Yemekler ve İçecekler -->
+        <!-- Ana Yemekler -->
         <h2 class="category-title">Ana Yemekler</h2>
         <div class="menu-list">
             <div class="menu-item"><span class="item-name">Izgara Köfte Porsiyon</span><span class="item-price">₺ 160</span></div>
@@ -75,7 +168,7 @@
     </div>
 
     <script>
-        // Kendi Firebase Config Bilgilerin
+        // Senin Firebase Config Bilgilerin
         const firebaseConfig = {
             apiKey: "AIzaSyB9Nhe3GvmZIBPc0mIrLJAschX5YyzCqIU",
             authDomain: "guleryuzqrmenu.firebaseapp.com",
@@ -83,7 +176,7 @@
             storageBucket: "guleryuzqrmenu.firebasestorage.app",
             messagingSenderId: "449556886457",
             appId: "1:449556886457:web:f215f6aa95701de02efc68",
-            databaseURL: "https://guleryuzqrmenu-default-rtdb.firebaseio.com" // Veritabanı URL'si eklendi
+            databaseURL: "https://guleryuzqrmenu-default-rtdb.firebaseio.com"
         };
 
         // Firebase'i Başlat
