@@ -14,10 +14,10 @@
         .header p { margin: 5px 0 0; color: #7f8c8d; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
         .container { padding: 15px; max-width: 600px; margin: 0 auto; }
         
-        /* GÜNÜN MENÜSÜ YENİ TASARIM */
+        /* GÜNÜN MENÜSÜ DIŞ ÇERÇEVE */
         .daily-menu-wrapper {
             background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
-            padding: 4px; /* Renkli kenarlık efekti için */
+            padding: 4px; 
             border-radius: 12px;
             margin-top: 20px;
             margin-bottom: 30px;
@@ -32,7 +32,7 @@
             text-align: center;
             border-bottom: 2px dashed #fda085;
             padding-bottom: 12px;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
         .daily-menu-header h3 {
             margin: 0;
@@ -44,17 +44,62 @@
             justify-content: center;
             gap: 10px;
         }
+
+        /* YENİ: VERİTABANINDAN GELEN YEMEKLERİN TASARIMI */
         #daily-content {
-            text-align: center;
-            font-size: 16px;
-            color: #2c3e50;
-            line-height: 1.8;
-            font-weight: 600;
-            margin-bottom: 20px;
-            padding: 15px 10px;
+            margin-bottom: 25px;
+        }
+        .dish-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .dish-item {
+            display: flex;
+            align-items: center;
             background-color: #fff7f3;
-            border-radius: 8px;
-            border-left: 5px solid #fda085;
+            border-left: 4px solid #f39c12;
+            padding: 12px 15px;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+            font-size: 15px;
+            font-weight: 600;
+            color: #2c3e50;
+            transition: transform 0.2s;
+        }
+        .dish-item:hover {
+            transform: translateX(5px);
+        }
+        .dish-icon {
+            margin-right: 12px;
+            font-size: 18px;
+            background-color: #ffeaa7;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* FİYAT PAKETLERİ (Aynı kaldı) */
+        .daily-options-title {
+            font-size: 14px;
+            color: #7f8c8d;
+            text-transform: uppercase;
+            text-align: center;
+            margin-bottom: 12px;
+            letter-spacing: 1px;
+            position: relative;
+        }
+        .daily-options-title::before, .daily-options-title::after {
+            content: "";
+            display: inline-block;
+            width: 30px;
+            height: 1px;
+            background-color: #ddd;
+            vertical-align: middle;
+            margin: 0 10px;
         }
         .daily-options {
             display: flex;
@@ -69,17 +114,8 @@
             border: 1px solid #eee;
             padding: 12px 15px;
             border-radius: 8px;
-            transition: all 0.3s ease;
         }
-        .daily-option-item:active {
-            transform: scale(0.98);
-            border-color: #fda085;
-        }
-        .daily-option-name {
-            font-weight: 700;
-            color: #34495e;
-            font-size: 15px;
-        }
+        .daily-option-name { font-weight: 700; color: #34495e; font-size: 15px; }
         .daily-option-price {
             font-weight: bold;
             color: #fff;
@@ -106,14 +142,17 @@
     </div>
     <div class="container">
         
-        <!-- YENİ GÜNÜN MENÜSÜ ALANI -->
+        <!-- GÜNÜN MENÜSÜ ALANI -->
         <div class="daily-menu-wrapper">
             <div class="daily-menu-inner">
                 <div class="daily-menu-header">
                     <h3>🍽️ Günün Menüsü</h3>
                 </div>
                 
+                <!-- Veritabanından gelen yemeklerin basılacağı alan -->
                 <div id="daily-content">Yükleniyor...</div>
+                
+                <div class="daily-options-title">Paket Seçenekleri</div>
                 
                 <div class="daily-options">
                     <div class="daily-option-item">
@@ -190,9 +229,27 @@
         menuRef.on('value', (snapshot) => {
             const data = snapshot.val();
             if (data && data.text) {
-                displayDiv.innerHTML = data.text;
+                // Veritabanından gelen metni <br> etiketlerinden parçalayıp listeye çeviriyoruz
+                const yemekler = data.text.split('<br>');
+                let htmlIcerik = '<div class="dish-list">';
+                
+                // Her bir yemek için ikonlu özel HTML kutucuğu oluşturuyoruz
+                yemekler.forEach(yemek => {
+                    if (yemek.trim() !== "") {
+                        htmlIcerik += `
+                            <div class="dish-item">
+                                <span class="dish-icon">🍲</span>
+                                <span class="dish-text">${yemek}</span>
+                            </div>
+                        `;
+                    }
+                });
+                
+                htmlIcerik += '</div>';
+                displayDiv.innerHTML = htmlIcerik;
+                
             } else {
-                displayDiv.innerHTML = "Lütfen günün menüsünü personelden öğreniniz.";
+                displayDiv.innerHTML = "<div style='text-align:center; padding:10px;'>Lütfen günün menüsünü personelden öğreniniz.</div>";
             }
         });
     </script>
