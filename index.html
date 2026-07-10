@@ -99,25 +99,33 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // 1. GÜNÜN MENÜSÜNÜ ÇEK
+
+                // GÜNÜN MENÜSÜNÜ ÇEK (4'LÜ YAPI)
         db.ref('gununMenusu').on('value', (snap) => {
             const data = snap.val();
             const displayDiv = document.getElementById("daily-content");
-            if (data && data.text) {
-                const yemekler = data.text.split('<br>');
+    
+            if (data) {
                 let html = '<div class="dish-list">';
-                yemekler.forEach(y => {
-                    if (y.trim() !== "") {
-                        html += `<div class="dish-item"><span class="dish-icon">🍲</span><span>${y}</span></div>`;
+                // 4 çeşidi sırayla kontrol et ve dolu olanları ekrana bas
+                for(let i=1; i<=4; i++) {
+                    let yemek = data['c' + i];
+                    if (yemek && yemek.trim() !== "") {
+                        html += `
+                            <div class="dish-item">
+                                <span class="dish-icon">🍲</span>
+                                <span>${yemek}</span>
+                            </div>
+                        `;
                     }
-                });
+                }
                 html += '</div>';
                 displayDiv.innerHTML = html;
             } else {
-                displayDiv.innerHTML = "<div style='text-align:center; padding:10px; color:#7f8c8d;'>Menü güncelleniyor...</div>";
-            }
+                displayDiv.innerHTML = "<div style='text-align:center; padding:10px; color:#7f8c8d;'>Menü henüz girilmedi.</div>";
+        }
         });
-
+       
         // 2. PAKET FİYATLARINI ÇEK
         db.ref('paketFiyatlari').on('value', snap => {
             const data = snap.val();
